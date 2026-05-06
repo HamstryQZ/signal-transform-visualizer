@@ -242,6 +242,25 @@ def compute_spectrum(sig_key, params_str, t, sig_values):
     return freq, X
 
 
+def _add_axis_arrows(fig):
+    """Add GeoGebra-style arrow heads at the positive ends of axes."""
+    xr = fig.layout.xaxis.range
+    yr = fig.layout.yaxis.range
+    if not xr or not yr:
+        return
+    # where axes cross: prefer origin, else fallback to edge
+    x0 = 0 if xr[0] <= 0 <= xr[1] else xr[0]
+    y0 = 0 if yr[0] <= 0 <= yr[1] else yr[0]
+    dlx = (xr[1] - xr[0]) * 0.03
+    dly = (yr[1] - yr[0]) * 0.03
+    fig.add_annotation(x=xr[1], y=y0, ax=xr[1] - dlx, ay=y0,
+                       xref="x", yref="y", showarrow=True,
+                       arrowhead=2, arrowsize=1.2, arrowwidth=1.5, arrowcolor='#888')
+    fig.add_annotation(x=x0, y=yr[1], ax=x0, ay=yr[1] - dly,
+                       xref="x", yref="y", showarrow=True,
+                       arrowhead=2, arrowsize=1.2, arrowwidth=1.5, arrowcolor='#888')
+
+
 def _make_plotly_fig(traces, layout_kw):
     """Helper: build a plotly figure with unified config."""
     fig = go.Figure()
@@ -256,6 +275,7 @@ def _make_plotly_fig(traces, layout_kw):
                      showline=True, linecolor='#bbb', linewidth=1)
     fig.update_yaxes(showgrid=True, gridwidth=0.5, gridcolor='#ddd',
                      showline=True, linecolor='#bbb', linewidth=1)
+    _add_axis_arrows(fig)
     return fig
 
 
@@ -311,6 +331,7 @@ def _pole_zero_fig(poles, zeros, roc_text, s_lim):
         showlegend=True,
         legend=dict(orientation='h', y=1.02, x=0.5, xanchor='center'),
     )
+    _add_axis_arrows(fig)
     return fig
 
 
