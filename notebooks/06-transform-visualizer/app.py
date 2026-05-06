@@ -382,6 +382,7 @@ with tabs[0]:
     col_left, col_right = st.columns([1.5, 1])
 
     with col_left:
+        st.markdown("**时域波形** — " + sig["latex"])
         x_min = -0.5 if sig["causal"] else -t_max
         ymin, ymax = float(np.min(sig_values)), float(np.max(sig_values))
         ypad = max((ymax - ymin) * 0.15, 0.1)
@@ -416,9 +417,6 @@ with tabs[0]:
 # Tab 2: 傅里叶变换
 # ============================================================
 with tabs[1]:
-    st.markdown("**傅里叶变换表达式**")
-    st.markdown(sig["ft_latex"])
-
     if sig["ft_has_delta"]:
         st.info(
             "该信号的傅里叶变换含有冲激（$\delta$ 函数），"
@@ -445,6 +443,7 @@ with tabs[1]:
     phase_masked[mag < phase_mask_thr] = None
 
     with col_left:
+        st.markdown("**幅度频谱** — " + sig["ft_latex"])
         mag = np.abs(X_pos)
         fig = _make_plotly_fig(
             [go.Scatter(x=f_pos, y=mag, mode='lines',
@@ -458,6 +457,7 @@ with tabs[1]:
         st.plotly_chart(fig, use_container_width=True, config=_plotly_config())
 
     with col_right:
+        st.markdown("**相位频谱** — " + sig["ft_latex"])
         fig = _make_plotly_fig(
             [go.Scatter(x=f_pos, y=phase_masked, mode='lines',
                         name='∠X(f)', line=dict(color='darkgreen', width=1.8),
@@ -514,12 +514,10 @@ with tabs[2]:
             "拉普拉斯变换要求信号在 $t<0$ 时为零（因果）或具有合适的收敛域。"
         )
     else:
-        st.markdown("**拉普拉斯变换表达式**")
-        st.markdown(sig["lt_latex"])
-
         col_left, col_right = st.columns([1, 1])
 
         with col_left:
+            st.markdown("**拉普拉斯变换** — " + sig["lt_latex"])
             real_poles = []
             real_zeros = []
 
