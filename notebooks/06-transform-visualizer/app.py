@@ -293,12 +293,13 @@ def _pole_zero_fig(poles, zeros, roc_text, s_lim):
         title=dict(text='s 平面零极点图', x=0.5),
         xaxis=dict(
             title='σ', range=[-s_lim, s_lim],
-            scaleanchor='y', constrain='domain',
             showgrid=True, gridwidth=0.5, gridcolor='#eee', zeroline=False,
+            automargin=True,
         ),
         yaxis=dict(
             title='jω', range=[-s_lim, s_lim],
             showgrid=True, gridwidth=0.5, gridcolor='#eee', zeroline=False,
+            automargin=True,
         ),
         hovermode='closest',
         margin=dict(l=40, r=20, t=50, b=40),
@@ -404,10 +405,6 @@ with tabs[0]:
     with col_left:
         st.markdown("**时域波形** — " + sig["latex"])
         x_min = -0.5 if sig["causal"] else -t_max
-        ymin, ymax = float(np.min(sig_values)), float(np.max(sig_values))
-        ypad = max((ymax - ymin) * 0.15, 0.1)
-        if ymin == ymax == 0:
-            ymin, ymax = -0.1, 1.1
 
         fig = _make_plotly_fig(
             [go.Scatter(x=t, y=sig_values, mode='lines',
@@ -415,7 +412,7 @@ with tabs[0]:
             dict(
                 title=dict(text='时域波形', x=0.5),
                 xaxis=dict(title='时间 (s)', range=[x_min, t_max]),
-                yaxis=dict(title='x(t)', range=[ymin - ypad, ymax + ypad]),
+                yaxis=dict(title='x(t)', automargin=True),
             ),
         )
         st.plotly_chart(fig, use_container_width=True, config=_plotly_config())
@@ -475,7 +472,7 @@ with tabs[1]:
             dict(
                 title=dict(text='幅度频谱', x=0.5),
                 xaxis=dict(title='频率 (Hz)', range=[0, fmax_show]),
-                yaxis=dict(title='|X(f)|'),
+                yaxis=dict(title='|X(f)|', automargin=True),
             ),
         )
         st.plotly_chart(fig, use_container_width=True, config=_plotly_config())
@@ -490,7 +487,7 @@ with tabs[1]:
             dict(
                 title=dict(text='相位频谱', x=0.5),
                 xaxis=dict(title='频率 (Hz)', range=[0, fmax_show]),
-                yaxis=dict(title='∠X(f) (rad)'),
+                yaxis=dict(title='∠X(f) (rad)', automargin=True),
             ),
         )
         st.plotly_chart(fig, use_container_width=True, config=_plotly_config())
