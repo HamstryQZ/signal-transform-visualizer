@@ -21,8 +21,10 @@ st.set_page_config(page_title="信号变换可视化工具", layout="wide")
 #   causal       — 是否为因果信号
 #   params       — 参数列表 [(key, label, min, max, default, step), ...]
 #   time_func    — 函数 x(t, **params)
-#   ft_latex     — 傅里叶变换表达式
-#   ft_has_delta — FT 是否含冲激（影响频谱显示方式）
+#   ft_latex      — 傅里叶变换表达式
+#   ft_has_delta  — FT 是否含冲激（影响频谱显示方式）
+#   ft_mag_latex  — 幅度频谱表达式 |X(jω)|
+#   ft_phase_latex — 相位频谱表达式 ∠X(jω)
 #   lt_latex     — 拉普拉斯变换表达式 (None 表示不存在)
 #   poles        — 极点列表 [(real, imag), ...]
 #   zeros        — 零点列表 [(real, imag), ...]
@@ -37,6 +39,8 @@ SIGNALS = {
         "time_func": lambda t, **kw: np.where(np.abs(t) < np.abs(t[1]-t[0])/2, 1.0/np.abs(t[1]-t[0]), 0.0),
         "ft_latex": r"$X(j\omega) = 1$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = 1$",
+        "ft_phase_latex": r"$\angle X(j\omega) = 0$",
         "lt_latex": r"$X(s) = 1$",
         "poles": [],
         "zeros": [],
@@ -65,6 +69,8 @@ SIGNALS = {
         "time_func": lambda t, a=1.0: np.exp(-a * t) * (t >= 0),
         "ft_latex": r"$X(j\omega) = \dfrac{1}{a + j\omega}$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = \dfrac{1}{\sqrt{a^2 + \omega^2}}$",
+        "ft_phase_latex": r"$\angle X(j\omega) = -\arctan(\omega / a)$",
         "lt_latex": r"$X(s) = \dfrac{1}{s + a}$",
         "poles": [(-1, 0)],  # will be scaled by a
         "zeros": [],
@@ -79,6 +85,8 @@ SIGNALS = {
         "time_func": lambda t, a=1.0: t * np.exp(-a * t) * (t >= 0),
         "ft_latex": r"$X(j\omega) = \dfrac{1}{(a + j\omega)^2}$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = \dfrac{1}{a^2 + \omega^2}$",
+        "ft_phase_latex": r"$\angle X(j\omega) = -2\arctan(\omega / a)$",
         "lt_latex": r"$X(s) = \dfrac{1}{(s + a)^2}$",
         "poles": [(-1, 0), (-1, 0)],  # 二阶极点
         "zeros": [],
@@ -125,6 +133,8 @@ SIGNALS = {
             np.exp(-a * t) * np.sin(2 * np.pi * f0 * t) * (t >= 0)),
         "ft_latex": r"$X(j\omega) = \dfrac{\omega_0}{(a+j\omega)^2 + \omega_0^2}$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = \dfrac{\omega_0}{\sqrt{(a^2+\omega_0^2-\omega^2)^2 + 4a^2\omega^2}}$",
+        "ft_phase_latex": r"$\angle X(j\omega) = -\arctan\!\left(\dfrac{2a\omega}{a^2+\omega_0^2-\omega^2}\right)$",
         "lt_latex": r"$X(s) = \dfrac{\omega_0}{(s+a)^2 + \omega_0^2}$",
         "poles": [(-0.5, 2), (-0.5, -2)],
         "zeros": [],
@@ -139,6 +149,8 @@ SIGNALS = {
         "time_func": lambda t, tau=2.0: (np.abs(t) <= tau / 2).astype(float),
         "ft_latex": r"$X(j\omega) = \tau\;\mathrm{sinc}\!\left(\dfrac{\tau\omega}{2}\right)$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = \tau\left|\mathrm{sinc}\!\left(\dfrac{\tau\omega}{2}\right)\right|$",
+        "ft_phase_latex": r"$\angle X(j\omega) = \begin{cases}0,&\mathrm{sinc}\ge0\\ \pm\pi,&\mathrm{sinc}<0\end{cases}$",
         "lt_latex": None,
         "poles": [],
         "zeros": [],
@@ -153,6 +165,8 @@ SIGNALS = {
         "time_func": lambda t, tau=1.5: np.exp(-(t / tau) ** 2),
         "ft_latex": r"$X(j\omega) = \sqrt{\pi}\,\tau\; e^{-(\tau\omega/2)^2}$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = \sqrt{\pi}\,\tau\,e^{-(\tau\omega/2)^2}$",
+        "ft_phase_latex": r"$\angle X(j\omega) = 0$",
         "lt_latex": None,
         "poles": [],
         "zeros": [],
@@ -168,6 +182,8 @@ SIGNALS = {
         "time_func": lambda t, tau=1.0: np.sinc(t / tau),
         "ft_latex": r"$X(j\omega) = \tau\;\mathrm{rect}\!\left(\dfrac{\tau\omega}{2\pi}\right)$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = \tau\;\mathrm{rect}\!\left(\dfrac{\tau\omega}{2\pi}\right)$",
+        "ft_phase_latex": r"$\angle X(j\omega) = 0$",
         "lt_latex": None,
         "poles": [],
         "zeros": [],
@@ -182,6 +198,8 @@ SIGNALS = {
         "time_func": lambda t, **kw: np.sign(t),
         "ft_latex": r"$X(j\omega) = \dfrac{2}{j\omega}$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = \dfrac{2}{|\omega|}$",
+        "ft_phase_latex": r"$\angle X(j\omega) = -\dfrac{\pi}{2}\mathrm{sgn}(\omega)$",
         "lt_latex": None,
         "poles": [],
         "zeros": [],
@@ -196,6 +214,8 @@ SIGNALS = {
         "time_func": lambda t, a=1.0: np.exp(-a * np.abs(t)),
         "ft_latex": r"$X(j\omega) = \dfrac{2a}{a^2 + \omega^2}$",
         "ft_has_delta": False,
+        "ft_mag_latex": r"$|X(j\omega)| = \dfrac{2a}{a^2 + \omega^2}$",
+        "ft_phase_latex": r"$\angle X(j\omega) = 0$",
         "lt_latex": None,
         "poles": [],
         "zeros": [],
@@ -417,6 +437,9 @@ with tabs[0]:
 # Tab 2: 傅里叶变换
 # ============================================================
 with tabs[1]:
+    st.markdown("**傅里叶变换表达式**")
+    st.markdown(sig["ft_latex"])
+
     if sig["ft_has_delta"]:
         st.info(
             "该信号的傅里叶变换含有冲激（$\delta$ 函数），"
@@ -443,7 +466,8 @@ with tabs[1]:
     phase_masked[mag < phase_mask_thr] = None
 
     with col_left:
-        st.markdown("**幅度频谱** — " + sig["ft_latex"])
+        if "ft_mag_latex" in sig:
+            st.markdown("**幅度频谱** — " + sig["ft_mag_latex"])
         mag = np.abs(X_pos)
         fig = _make_plotly_fig(
             [go.Scatter(x=f_pos, y=mag, mode='lines',
@@ -457,7 +481,8 @@ with tabs[1]:
         st.plotly_chart(fig, use_container_width=True, config=_plotly_config())
 
     with col_right:
-        st.markdown("**相位频谱** — " + sig["ft_latex"])
+        if "ft_phase_latex" in sig:
+            st.markdown("**相位频谱** — " + sig["ft_phase_latex"])
         fig = _make_plotly_fig(
             [go.Scatter(x=f_pos, y=phase_masked, mode='lines',
                         name='∠X(f)', line=dict(color='darkgreen', width=1.8),
