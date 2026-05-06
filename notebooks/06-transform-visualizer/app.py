@@ -252,8 +252,10 @@ def _make_plotly_fig(traces, layout_kw):
         margin=dict(l=40, r=20, t=40, b=40),
         **layout_kw,
     )
-    fig.update_xaxes(showgrid=True, gridwidth=0.5, gridcolor='#eee')
-    fig.update_yaxes(showgrid=True, gridwidth=0.5, gridcolor='#eee')
+    fig.update_xaxes(showgrid=True, gridwidth=0.5, gridcolor='#ddd',
+                     showline=True, linecolor='#bbb', linewidth=1)
+    fig.update_yaxes(showgrid=True, gridwidth=0.5, gridcolor='#ddd',
+                     showline=True, linecolor='#bbb', linewidth=1)
     return fig
 
 
@@ -293,13 +295,15 @@ def _pole_zero_fig(poles, zeros, roc_text, s_lim):
         title=dict(text='s 平面零极点图', x=0.5),
         xaxis=dict(
             title='σ', range=[-s_lim, s_lim],
-            showgrid=True, gridwidth=0.5, gridcolor='#eee', zeroline=False,
-            automargin=True,
+            showgrid=True, gridwidth=0.5, gridcolor='#ddd',
+            showline=True, linecolor='#bbb', linewidth=1,
+            zeroline=False, automargin=True,
         ),
         yaxis=dict(
             title='jω', range=[-s_lim, s_lim],
-            showgrid=True, gridwidth=0.5, gridcolor='#eee', zeroline=False,
-            automargin=True,
+            showgrid=True, gridwidth=0.5, gridcolor='#ddd',
+            showline=True, linecolor='#bbb', linewidth=1,
+            zeroline=False, automargin=True,
         ),
         hovermode='closest',
         margin=dict(l=40, r=20, t=50, b=40),
